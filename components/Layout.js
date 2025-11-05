@@ -101,7 +101,7 @@ export default function Layout({ children }) {
             <Link href="/home">
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <img
-                  src="/images/Icon.png"
+                  src="/images/icon.png"
                   alt="General Q&A Logo"
                   style={{ height: '40px', marginRight: '10px' }}
                   onError={(e) => {
@@ -306,7 +306,7 @@ export default function Layout({ children }) {
         <div className="footer-container">
           <div className="footer-grid">
             <div className="footer-col footer-brand">
-              <img src="/images/Icon.png" alt="General Q&A Logo" className="footer-logo" />
+              <img src="/images/icon.png" alt="General Q&A Logo" className="footer-logo" />
               <p className="footer-desc">General Q&amp;A is a community-driven platform for asking and answering questions across a wide range of topics. Share knowledge, help others, and learn together.</p>
               <div className="footer-socials">
                 <a href="#" aria-label="Twitter" className="footer-social"><span>�</span></a>

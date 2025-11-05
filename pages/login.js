@@ -46,7 +46,7 @@ export default function Login() {
     <div className="auth-container lssi-login">
       <div className="auth-card lssi-card">
         <div className="lssi-logo-wrap">
-          <img src="/images/BusinessBee.png" alt="Business Bee Logo" className="lssi-logo" />
+          <img src="/images/icon.png" alt="General Q&A Logo" className="lssi-logo" />
         </div>
         <h2 className="lssi-signin-title">Sign in</h2>
         {showError && (

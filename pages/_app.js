@@ -11,7 +11,7 @@ function MyApp({ Component, pageProps }) {
         <Head>
           <title>General Q&A — Ask, Answer, Discover</title>
           <meta name="description" content="A community-driven general question and answer platform. Ask questions, share knowledge, and discover answers." />
-          <link rel="icon" href="/images/Icon.png" />
+          <link rel="icon" href="/images/icon.png" />
         </Head>
         <Layout>
           <Component {...pageProps} />

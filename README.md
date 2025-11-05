@@ -1,7 +1,7 @@
 # General Q&A — Community Knowledge Platform
 
 <p align="center">
-  <img src="public/images/Icon.png" alt="General Q&A Logo" width="120">
+  <img src="public/images/icon.png" alt="General Q&A Logo" width="120">
 </p>
 
 <p align="center">

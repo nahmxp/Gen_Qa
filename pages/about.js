@@ -24,7 +24,7 @@ export default function About() {
           </div>
           <div className="about-image">
             <img 
-              src="/images/Icon.png" 
+              src="/images/icon.png" 
               alt="General Q&A" 
               className="rounded-image"
             />
