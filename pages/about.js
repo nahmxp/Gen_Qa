@@ -127,9 +127,6 @@ export default function About() {
           <h2>Get Involved</h2>
           <p>Start asking, answering, and helping build a helpful knowledge base for everyone.</p>
           <div className="cta-buttons">
-            <Link href="/add-product">
-              <button className="btn-primary">Ask a Question</button>
-            </Link>
             <Link href="/contact">
               <button className="btn-outline">Contact Support</button>
             </Link>

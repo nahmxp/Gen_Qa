@@ -5,94 +5,68 @@
 </p>
 
 <p align="center">
-  <b>A Community-driven platform to ask questions and share knowledge</b>
+  <b>A community-driven platform for asking questions and sharing knowledge</b>
 </p>
 
-General Q&amp;A is a community-focused platform for asking and answering general questions across many topics. It helps people find clear, practical answers and share their expertise with others.
+General Q&A is a community-focused platform where users can ask questions, share problems, and help others find answers across various topics.
 
 ## 📚 Project Overview
 
-General Q&A transforms the way people find answers by offering a community-curated knowledge platform across many topics. The platform focuses on:
+General Q&A provides a simple, user-friendly platform for knowledge sharing:
 
-- **Audience-Targeted Content**: Specialized sections for Kids, Adults, and Higher Education
-- **Digital-First Experience**: Robust support for various digital content formats 
-- **User-Centric Design**: Intuitive interfaces with personalized libraries and reading preferences
-- **Educational Focus**: Academic tools including DOI referencing and citation capabilities
+- **Community-Driven**: Users can ask questions and share problems
+- **Problem Sharing**: Dedicated system for sharing and discussing problems
+- **Admin Moderation**: Administrators can manage issues and user problems
+- **User Profiles**: Personal profiles and account management
+- **Clean Interface**: Modern, responsive design with dark/light theme support
 
 ## 🛠️ Technology Stack
 
 ### Frontend
-- **Framework**: Next.js 15 (React)
+- **Framework**: Next.js (React)
 - **Styling**: CSS-in-JS with styled-jsx, custom theming system
-- **State Management**: React Context API with custom hooks
-- **Responsive Design**: Mobile-first approach with media queries
+- **State Management**: React Context API
+- **Responsive Design**: Mobile-first approach
 
 ### Backend
 - **API Framework**: Next.js API routes (serverless functions)
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: Custom JWT implementation with HTTP-only cookies
-- **Content Delivery**: Dynamic content serving with content-type specific viewers
 
-### Payment Processing
-- **Provider**: Stripe integration for secure payments
-- **Webhook System**: Asynchronous order processing via webhooks
-
-### Deployment & Infrastructure
-- **Hosting**: Vercel for both frontend and serverless functions
-- **Image Storage**: Optimized image delivery system
-- **CI/CD**: Automated deployments via GitHub integration
+### Deployment
+- **Hosting**: Vercel (recommended)
+- **CI/CD**: Automated deployments via GitHub
 
 ## 🔍 Core Features
 
-### 1. Audience-Specific Content Discovery
-- **Home Page Sections**: Dedicated sections for Kids, Adults, and Higher Education
-- **Advanced Filtering**: Filter by age range, academic level, category, format
-- **Smart Search**: Full-text search with relevance ranking
-- **Category Navigation**: Intuitive browsing by subject and interest areas
+### 1. User Management
+- User registration and authentication
+- Profile management
+- Role-based access (User/Admin)
 
-### 2. Digital Content System
-- **Multiple Formats**: Support for PDF, EPUB, DOC(X), TXT formats
-- **Academic Resources**: DOI integration for scholarly articles and research papers
-- **External Resources**: Linking capability to external educational platforms
-- **Content Security**: Access control based on purchase history and user permissions
+### 2. Problem Sharing
+- Users can share problems and issues
+- Community engagement with problems
+- Admin moderation and management
 
-### 3. User Management
-- **Account System**: Registration, authentication, and profile management
-- **Role-Based Access**: User/Admin permission system
-- **Personal Libraries**: User-specific book collections and reading history
-- **Reading Progress**: Save and resume reading positions
+### 3. Admin Dashboard
+- User management
+- Problem/issue management
+- Analytics and reporting
 
-### 4. E-Commerce Capabilities
-- **Shopping Cart**: Add and manage multiple items
-- **Wishlist**: Save items for future purchase consideration
-- **Checkout Process**: Streamlined, secure payment flow
-- **Order Management**: Track order status and history
-
-### 5. Admin Dashboard
-- **Content Management**: Add, edit, and remove books
-- **User Management**: Manage user accounts and permissions
-- **Order Processing**: Monitor and update order status
-- **Analytics**: Basic reporting on popular content and user activity
-
-### 6. Reading Experience
-- **In-Browser Reader**: View PDFs and documents directly in browser
-- **Accessibility Features**: Text size adjustment, color themes
-- **Bookmarks & Notes**: Save positions and add personal notes (premium feature)
-- **Mobile Optimization**: Responsive reading experience across devices
+### 4. User Experience
+- Clean, intuitive interface
+- Dark/Light theme toggle
+- Responsive mobile design
 
 ## 📁 Project Structure
 
 ```
-general-qa/
+Gen_Qa/
 ├── components/            # Reusable UI components
-│   ├── CategoryTabs.js    # Audience category navigation tabs
-│   ├── FilterBar.js       # Content filtering system
 │   ├── ImageCarousel.js   # Image slideshow component
 │   ├── Layout.js          # Main app layout with navigation
-│   ├── PriceRangeFilter.js# Price range selector component
-│   ├── ProductCard.js     # Book display card component
-│   ├── ProductSlider.js   # Horizontal scrolling book list
-│   ├── SearchBar.js       # Global search interface
+│   ├── SearchBar.js       # Search interface
 │   └── ThemeToggle.js     # Light/dark mode toggle
 │
 ├── lib/                   # Core utilities and context providers
@@ -108,53 +82,35 @@ general-qa/
 │   └── withAuth.js        # User route protection HOC
 │
 ├── models/                # MongoDB schemas
-│   ├── Cart.js            # Shopping cart model
-│   ├── Order.js           # Order processing model
-│   ├── Product.js         # Book/product model
-│   ├── User.js            # User account model
-│   └── Wishlist.js        # User wishlist model
+│   ├── PickupRequest.js   # Pickup request model
+│   ├── Problem.js         # Problem/issue model
+│   └── User.js            # User account model
 │
 ├── pages/                 # Application routes and API endpoints
 │   ├── _app.js            # Next.js app initialization
 │   ├── _document.js       # HTML document customization
 │   ├── about.js           # About page
-│   ├── add-product.js     # Add new book page (admin)
-│   ├── all-orders.js      # Order management (admin)
-│   ├── cart.js            # Shopping cart page
-│   ├── catalog.js         # Main book browsing interface
-│   ├── checkout.js        # Payment processing
 │   ├── contact.js         # Contact information page
 │   ├── dashboard.js       # Admin dashboard
-│   ├── home.js            # Homepage with audience sections
+│   ├── home.js            # Homepage
 │   ├── index.js           # Root route (redirects to home)
 │   ├── login.js           # User authentication
-│   ├── my-library.js      # User's purchased books
-│   ├── orders.js          # User's order history
-│   ├── profile.js         # User profile management
+│   ├── profile.js          # User profile management
 │   ├── signup.js          # New user registration
-│   ├── wishlist.js        # User's saved items
+│   ├── share-problem.js   # Share a problem page
+│   ├── pickup-request.js  # Pickup request page
+│   ├── my-pickup-requests.js # User's pickup requests
+│   ├── all-pickup-requests.js # All pickup requests (admin)
 │   │
-│   ├── api/               # Backend API routes
-│   │   ├── orders.js      # Order management endpoints
-│   │   ├── products.js    # Book catalog endpoints
-│   │   ├── seed-books.js  # Database seeding utility
-│   │   ├── seed-orders.js # Test order generation
-│   │   ├── transactions.js# Payment processing
-│   │   ├── users.js       # User management
-│   │   │
-│   │   ├── admin/         # Admin-only endpoints
-│   │   ├── auth/          # Authentication endpoints
-│   │   ├── books/         # Book content endpoints
-│   │   ├── order/         # Order processing
-│   │   ├── payment/       # Payment processing
-│   │   ├── product/       # Product details
-│   │   └── user/          # User data endpoints
+│   ├── admin/             # Admin pages
+│   │   └── issues.js       # Problem management
 │   │
-│   ├── brand/             # Publisher/brand pages
-│   ├── category/          # Category browsing pages
-│   ├── product/           # Product detail pages
-│   ├── reader/            # Digital content reader
-│   └── update-product/    # Product editing (admin)
+│   └── api/               # Backend API routes
+│       ├── auth/          # Authentication endpoints
+│       ├── admin/         # Admin-only endpoints
+│       ├── problems.js    # Problem management endpoints
+│       ├── pickup-requests.js # Pickup request endpoints
+│       └── users.js       # User management endpoints
 │
 ├── public/                # Static assets
 │   └── images/            # Image assets
@@ -172,82 +128,69 @@ general-qa/
 
 ### Installation
 
-1. Clone the repository
+1. **Clone the repository**
 ```bash
 git clone https://github.com/nahmxp/general-qa.git
 cd general-qa
 ```
 
-2. Install dependencies
+2. **Install dependencies**
 ```bash
 npm install
 # or
 yarn install
 ```
 
-3. Set up environment variables
+3. **Set up environment variables**
+
 Create a `.env.local` file with the following variables:
 ```
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
-STRIPE_SECRET_KEY=your_stripe_secret_key
-STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 ```
 
-4. Run the development server
+4. **Run the development server**
 ```bash
 npm run dev
 # or
 yarn dev
 ```
 
-5. Access the application at `http://localhost:3000`
+5. **Access the application**
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📋 User Roles & Permissions
 
 ### Regular User
-- Browse the catalog
-- Filter by audience (Kids, Adults, Higher Education)
-- Search for books
-- Add books to wishlist
-- Purchase books
-- Access digital content for purchased items
-- View order history
-- Manage personal profile
+- Create account and manage profile
+- Share problems and issues
+- View community problems
+- Submit pickup requests
+- View own pickup requests
 
 ### Administrator
 - All regular user capabilities
-- Add/edit/remove books from catalog
 - Manage user accounts
-- Process orders
-- View platform analytics
+- Moderate problems and issues
+- Manage pickup requests
 - Access admin dashboard
+- View platform analytics
 
-## 🔄 Workflow Examples
+## 🔄 Key Features
 
-### User Purchase Flow
-1. Browse catalog or search for books
-2. Filter by target audience (Kids/Adults/Higher Education)
-3. Add desired books to cart
-4. Proceed to checkout
-5. Complete payment with Stripe
-6. Access purchased content in "My Library"
+### Problem Sharing
+Users can share problems they're facing, allowing the community to help find solutions.
 
-### Content Management Flow (Admin)
-1. Login with admin credentials
-2. Navigate to "Add Book" page
-3. Enter book details including:
-   - Title, author, description
-   - Target audience and age range (for Kids section)
-   - Digital content links or uploads
-   - Pricing information
-4. Submit to add to catalog
-5. Edit or remove via product management interface
+### Pickup Requests
+Users can submit pickup requests for various services.
+
+### Admin Management
+Administrators can manage all user-generated content, moderate issues, and oversee platform operations.
 
 ## 🤝 Contributing
 
-We welcome contributions to the General Q&amp;A platform! Please follow these steps:
+We welcome contributions! Please follow these steps:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -266,5 +209,5 @@ Project Owner: [nahmxp](https://github.com/nahmxp)
 ---
 
 <p align="center">
-  General Q&amp;A - Illuminating the path to knowledge in the digital age
+  General Q&A - Ask, Answer, Discover
 </p>

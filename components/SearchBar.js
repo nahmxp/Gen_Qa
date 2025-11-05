@@ -44,23 +44,11 @@ export default function SearchBar() {
     setShowResults(false);
   }, [router.asPath]);
 
-  // Search products from the API
+  // Search functionality disabled - no products API available
   const performSearch = async () => {
-    if (!query.trim()) return;
-
-    setIsSearching(true);
-    try {
-      const response = await fetch(`/api/products?search=${encodeURIComponent(query)}`);
-      if (!response.ok) throw new Error('Search failed');
-      
-      const data = await response.json();
-      setResults(data);
-      setShowResults(true);
-    } catch (error) {
-      console.error('Error searching products:', error);
-    } finally {
-      setIsSearching(false);
-    }
+    // Search functionality removed
+    setResults([]);
+    setShowResults(false);
   };
 
   // Handle key press for search
@@ -77,7 +65,7 @@ export default function SearchBar() {
         <input
           type="text"
           className="search-input"
-          placeholder="Search products..."
+          placeholder="Search..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -99,33 +87,10 @@ export default function SearchBar() {
         </button>
       </div>
 
-      {showResults && results.length > 0 && (
-        <div className="search-results">
-          {results.map((product) => (
-            <Link 
-              href={`/product/${product._id}`} 
-              key={product._id}
-              onClick={() => setShowResults(false)}
-            >
-              <div className="search-result-item">
-                <div className="search-result-image">
-                  <img src={product.image || 'https://via.placeholder.com/50'} alt={product.name} />
-                </div>
-                <div className="search-result-info">
-                  <h4>{product.name}</h4>
-                  <p className="search-result-brand">{product.brand}</p>
-                  <p className="search-result-price">৳{product.price}</p>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-
       {showResults && query.trim().length > 1 && results.length === 0 && !isSearching && (
         <div className="search-results">
           <div className="search-no-results">
-            No products found matching "{query}"
+            No results found
           </div>
         </div>
       )}

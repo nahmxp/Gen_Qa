@@ -11,8 +11,6 @@ export default function Layout({ children }) {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
   const { user, isAuthenticated, isAdmin, loading, logout } = useAuth();
-  const [wishlistCount, setWishlistCount] = useState(0);
-  const [cartCount, setCartCount] = useState(0);
   const [showCookieWarning, setShowCookieWarning] = useState(false);
   
   console.log('user:', user);
@@ -23,104 +21,6 @@ export default function Layout({ children }) {
     // Update navigation key when auth state changes
     setNavKey(prevKey => prevKey + 1);
   }, [isAuthenticated, isAdmin, user]);
-
-  // Load wishlist count
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      setWishlistCount(0);
-      return;
-    }
-
-    const fetchWishlistCount = async () => {
-      try {
-        // Try to fetch wishlist from API first
-        const response = await fetch('/api/user/wishlist');
-        if (response.ok) {
-          const wishlistData = await response.json();
-          const items = wishlistData.items || [];
-          setWishlistCount(items.length);
-          return;
-        }
-      } catch (error) {
-        console.error('Error fetching wishlist from API:', error);
-      }
-
-      // Fallback to localStorage if API fails
-      try {
-        const userKey = `wishlist_${user._id}`;
-        const savedWishlist = JSON.parse(localStorage.getItem(userKey) || '[]');
-        setWishlistCount(savedWishlist.length);
-      } catch (error) {
-        console.error('Error parsing wishlist from localStorage:', error);
-      }
-    };
-
-    fetchWishlistCount();
-    
-    // Custom event for updating wishlist count from within the app
-    const handleCustomWishlistUpdate = (event) => {
-      // Only update if event is for current user
-      if (!event.detail || event.detail.userId === user._id) {
-        fetchWishlistCount();
-      }
-    };
-    
-    window.addEventListener('wishlist-updated', handleCustomWishlistUpdate);
-    
-    return () => {
-      window.removeEventListener('wishlist-updated', handleCustomWishlistUpdate);
-    };
-  }, [isAuthenticated, user]);
-
-  // Load cart count
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      setCartCount(0);
-      return;
-    }
-
-    const fetchCartCount = async () => {
-      try {
-        // Try to fetch cart from API first
-        const response = await fetch('/api/user/cart');
-        if (response.ok) {
-          const cartData = await response.json();
-          const items = cartData.items || [];
-          const totalItems = items.reduce((total, item) => total + (item.quantity || 1), 0);
-          setCartCount(totalItems);
-          return;
-        }
-      } catch (error) {
-        console.error('Error fetching cart from API:', error);
-      }
-
-      // Fallback to localStorage if API fails
-      try {
-        const userKey = `cart_${user._id}`;
-        const savedCart = JSON.parse(localStorage.getItem(userKey) || '[]');
-        const totalItems = savedCart.reduce((total, item) => total + (item.quantity || 1), 0);
-        setCartCount(totalItems);
-      } catch (error) {
-        console.error('Error parsing cart from localStorage:', error);
-      }
-    };
-
-    fetchCartCount();
-    
-    // Custom event for updating cart count from within the app
-    const handleCustomCartUpdate = (event) => {
-      // Only update if event is for current user
-      if (!event.detail || event.detail.userId === user._id) {
-        fetchCartCount();
-      }
-    };
-    
-    window.addEventListener('cart-updated', handleCustomCartUpdate);
-    
-    return () => {
-      window.removeEventListener('cart-updated', handleCustomCartUpdate);
-    };
-  }, [isAuthenticated, user]);
 
   // Check if cookies are enabled
   useEffect(() => {
@@ -228,8 +128,6 @@ export default function Layout({ children }) {
             <ul className="nav-links">
               <li className={isActive('/home')}><Link href="/home" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
               <li className={isActive('/about')}><Link href="/about" onClick={() => setMobileMenuOpen(false)}>About</Link></li>
-              <li className={isActive('/catalog')}><Link href="/catalog" onClick={() => setMobileMenuOpen(false)}>Categories</Link></li>
-              <li className={isActive('/add-product')}><Link href="/add-product" onClick={() => setMobileMenuOpen(false)}>Ask a Question</Link></li>
               <li className={isActive('/share-problem')}><Link href="/share-problem" onClick={() => setMobileMenuOpen(false)}>Share a Problem</Link></li>
               <li className={isActive('/contact')}><Link href="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link></li>
               {/* ...existing code... */}
@@ -248,14 +146,6 @@ export default function Layout({ children }) {
                   </button>
                   {adminDropdownOpen && (
                     <ul className="admin-dropdown-menu">
-                      <li className={isActive('/add-product')}>
-                        <Link href="/add-product" onClick={() => {
-                          setAdminDropdownOpen(false);
-                          setMobileMenuOpen(false);
-                        }}>
-                          Add Product
-                        </Link>
-                      </li>
                         <li className={isActive('/admin/issues')}>
                           <Link href="/admin/issues" onClick={() => {
                             setAdminDropdownOpen(false);
@@ -272,15 +162,6 @@ export default function Layout({ children }) {
                           Users Dashboard
                         </Link>
                       </li>
-                      <li className={isActive('/all-orders')}>
-                        <Link href="/all-orders" onClick={() => {
-                          setAdminDropdownOpen(false);
-                          setMobileMenuOpen(false);
-                        }}>
-                          All Orders
-                        </Link>
-                      </li>
-
                     </ul>
                   )}
                 </li>
@@ -301,26 +182,6 @@ export default function Layout({ children }) {
           </nav>
           
           <div className="header-actions">
-            {isAuthenticated && (
-              <>
-                <Link href="/wishlist" className="wishlist-icon-link">
-                  <div className="wishlist-icon">
-                    <span className="wishlist-heart">♥</span>
-                    {wishlistCount > 0 && (
-                      <span className="wishlist-badge">{wishlistCount}</span>
-                    )}
-                  </div>
-                </Link>
-                <Link href="/cart" className="cart-icon-link">
-                  <div className="cart-icon">
-                    <span className="cart-basket">🛒</span>
-                    {cartCount > 0 && (
-                      <span className="cart-badge">{cartCount}</span>
-                    )}
-                  </div>
-                </Link>
-              </>
-            )}
             <ThemeToggle />
             
             {isAuthenticated ? (
@@ -348,26 +209,6 @@ export default function Layout({ children }) {
                           Profile
                         </Link>
                       </li>
-                      <li>
-                        <Link href="/wishlist" onClick={() => setProfileDropdownOpen(false)}>
-                          Wishlist
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/cart" onClick={() => setProfileDropdownOpen(false)}>
-                          Cart
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/orders" onClick={() => setProfileDropdownOpen(false)}>
-                          My Orders
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/my-library" onClick={() => setProfileDropdownOpen(false)}>
-                          My Courses
-                        </Link>
-                      </li>
 
                       {isAdmin && (
                         <li className="admin-section-header">Admin Options</li>
@@ -376,20 +217,6 @@ export default function Layout({ children }) {
                         <li>
                           <Link href="/dashboard" onClick={() => setProfileDropdownOpen(false)}>
                             Users Dashboard
-                          </Link>
-                        </li>
-                      )}
-                      {isAdmin && (
-                        <li>
-                          <Link href="/all-orders" onClick={() => setProfileDropdownOpen(false)}>
-                            All Orders
-                          </Link>
-                        </li>
-                      )}
-                      {isAdmin && (
-                        <li>
-                          <Link href="/add-product" onClick={() => setProfileDropdownOpen(false)}>
-                            Add Product
                           </Link>
                         </li>
                       )}
@@ -439,15 +266,12 @@ export default function Layout({ children }) {
             <div className="footer-col footer-links">
               <div className="footer-section">
                 <div className="footer-section-title">Explore</div>
-                <a href="/catalog" className="footer-link">Browse Categories</a>
                 <a href="/home" className="footer-link">Home</a>
                 <a href="/about" className="footer-link">About</a>
               </div>
               <div className="footer-section">
                   <div className="footer-section-title">Community</div>
-                  <a href="/add-product" className="footer-link">Ask a Question</a>
                   <a href="/share-problem" className="footer-link">Share a Problem</a>
-                  <a href="/wishlist" className="footer-link">My Profile</a>
                   <a href="/contact" className="footer-link">Contact Support</a>
               </div>
             </div>

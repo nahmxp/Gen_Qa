@@ -11,14 +11,8 @@ export default function Home() {
           <h1>General Q&A — Ask, Answer, Discover</h1>
           <p className="lead">A friendly, community-driven platform to ask general questions, share knowledge, and learn from others.</p>
           <div className="hero-actions">
-            <Link href="/add-product">
-              <button className="btn-primary">Ask a Question</button>
-            </Link>
             <Link href="/share-problem">
               <button className="btn-secondary">Share a Problem</button>
-            </Link>
-            <Link href="/catalog">
-              <button className="btn-outline">Browse Categories</button>
             </Link>
           </div>
         </div>

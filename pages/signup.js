@@ -137,7 +137,7 @@ export default function Signup() {
       <div className="auth-card">
         <div className="auth-header">
           <h2>Create Account</h2>
-          <p>Sign up to start managing your products</p>
+          <p>Sign up to join the community</p>
         </div>
         
         {error && (
