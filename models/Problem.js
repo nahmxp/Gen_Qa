@@ -5,8 +5,12 @@ const ProblemSchema = new mongoose.Schema({
   description: { type: String, required: true },
   email: { type: String, trim: true, lowercase: true },
   anonymous: { type: Boolean, default: false },
+  location: { type: String, required: true, trim: true },
+  latitude: { type: Number },
+  longitude: { type: Number },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   status: { type: String, enum: ['open','in-progress','closed'], default: 'open' },
+  adminNotes: { type: String, trim: true }, // Admin remarks/feedback
 }, { timestamps: true });
 
 // Hardened model registration for Next.js hot reload

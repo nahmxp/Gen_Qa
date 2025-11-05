@@ -10,7 +10,7 @@ export default function Layout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
-  const { user, isAuthenticated, isAdmin, loading, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, isEnumerator, role, loading, logout } = useAuth();
   const [showCookieWarning, setShowCookieWarning] = useState(false);
   
   console.log('user:', user);
@@ -20,7 +20,7 @@ export default function Layout({ children }) {
   useEffect(() => {
     // Update navigation key when auth state changes
     setNavKey(prevKey => prevKey + 1);
-  }, [isAuthenticated, isAdmin, user]);
+    }, [isAuthenticated, isAdmin, isEnumerator, role, user]);
 
   // Check if cookies are enabled
   useEffect(() => {
@@ -131,7 +131,8 @@ export default function Layout({ children }) {
               <li className={isActive('/share-problem')}><Link href="/share-problem" onClick={() => setMobileMenuOpen(false)}>Share a Problem</Link></li>
               <li className={isActive('/contact')}><Link href="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link></li>
               {/* ...existing code... */}
-              {isAuthenticated && isAdmin && (
+              {/* Enumerator/Admin dropdown - show for enumerators and admins */}
+              {isAuthenticated && (isEnumerator || isAdmin) && (
                 <li className={`admin-dropdown ${adminDropdownOpen ? 'open' : ''}`}>
                   <button 
                     onClick={() => {
@@ -141,27 +142,62 @@ export default function Layout({ children }) {
                     className="admin-dropdown-toggle"
                   >
                     <span className="admin-icon">👑</span>
-                    Admin Options
+                    {isAdmin ? 'Admin Options' : 'Enumerator Options'}
                     <span className="dropdown-arrow">{adminDropdownOpen ? '▲' : '▼'}</span>
                   </button>
                   {adminDropdownOpen && (
                     <ul className="admin-dropdown-menu">
-                        <li className={isActive('/admin/issues')}>
-                          <Link href="/admin/issues" onClick={() => {
+                        {/* Admin-only: All Issues */}
+                        {isAdmin && (
+                          <li className={isActive('/admin/issues')}>
+                            <Link href="/admin/issues" onClick={() => {
+                              setAdminDropdownOpen(false);
+                              setMobileMenuOpen(false);
+                            }}>
+                              All Issues
+                            </Link>
+                          </li>
+                        )}
+                        {/* Enumerator/Admin: Collect Query */}
+                        <li className={isActive('/query-collection')}>
+                          <Link href="/query-collection" onClick={() => {
                             setAdminDropdownOpen(false);
                             setMobileMenuOpen(false);
                           }}>
-                            All Issues
+                            Collect Query
                           </Link>
                         </li>
-                      <li className={isActive('/dashboard')}>
-                        <Link href="/dashboard" onClick={() => {
-                          setAdminDropdownOpen(false);
-                          setMobileMenuOpen(false);
-                        }}>
-                          Users Dashboard
-                        </Link>
-                      </li>
+                        {/* Enumerator/Admin: My Query Submissions */}
+                        <li className={isActive('/my-query-submissions')}>
+                          <Link href="/my-query-submissions" onClick={() => {
+                            setAdminDropdownOpen(false);
+                            setMobileMenuOpen(false);
+                          }}>
+                            My Query Submissions
+                          </Link>
+                        </li>
+                        {/* Admin-only: All Queries */}
+                        {isAdmin && (
+                          <li className={isActive('/admin/queries')}>
+                            <Link href="/admin/queries" onClick={() => {
+                              setAdminDropdownOpen(false);
+                              setMobileMenuOpen(false);
+                            }}>
+                              All Queries
+                            </Link>
+                          </li>
+                        )}
+                        {/* Admin-only: Users Dashboard */}
+                        {isAdmin && (
+                          <li className={isActive('/dashboard')}>
+                            <Link href="/dashboard" onClick={() => {
+                              setAdminDropdownOpen(false);
+                              setMobileMenuOpen(false);
+                            }}>
+                              Users Dashboard
+                            </Link>
+                          </li>
+                        )}
                     </ul>
                   )}
                 </li>
@@ -194,6 +230,7 @@ export default function Layout({ children }) {
                   <span className="user-initial">{user?.name?.charAt(0) || user?.username?.charAt(0) || 'U'}</span>
                   <span className="user-name">{user?.name || user?.username}</span>
                   {isAdmin && <span className="admin-badge" title="Administrator">Admin</span>}
+                  {isEnumerator && !isAdmin && <span className="admin-badge" title="Enumerator">Enumerator</span>}
                 </button>
                 
                 {profileDropdownOpen && (
@@ -202,6 +239,7 @@ export default function Layout({ children }) {
                       <p className="profile-name">{user?.name}</p>
                       <p className="profile-email">{user?.email}</p>
                       {isAdmin && <p className="profile-role">Administrator</p>}
+                      {isEnumerator && !isAdmin && <p className="profile-role">Enumerator</p>}
                     </div>
                     <ul>
                       <li>
@@ -209,6 +247,19 @@ export default function Layout({ children }) {
                           Profile
                         </Link>
                       </li>
+                      <li>
+                        <Link href="/my-issues" onClick={() => setProfileDropdownOpen(false)}>
+                          My Issues
+                        </Link>
+                      </li>
+                      {/* Show My Query Submissions for enumerators and admins */}
+                      {(isEnumerator || isAdmin) && (
+                        <li>
+                          <Link href="/my-query-submissions" onClick={() => setProfileDropdownOpen(false)}>
+                            My Query Submissions
+                          </Link>
+                        </li>
+                      )}
 
                       {isAdmin && (
                         <li className="admin-section-header">Admin Options</li>

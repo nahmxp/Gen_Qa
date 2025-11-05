@@ -8,15 +8,19 @@
   <b>A community-driven platform for asking questions and sharing knowledge</b>
 </p>
 
-General Q&A is a community-focused platform where users can ask questions, share problems, and help others find answers across various topics.
+General Q&A is a community-focused platform where users can ask questions, share problems, and help others find answers across various topics. The platform includes a comprehensive query collection system for enumerators and administrators to manage and track community issues.
 
 ## 📚 Project Overview
 
 General Q&A provides a simple, user-friendly platform for knowledge sharing:
 
 - **Community-Driven**: Users can ask questions and share problems
-- **Problem Sharing**: Dedicated system for sharing and discussing problems
-- **Admin Moderation**: Administrators can manage issues and user problems
+- **Problem Sharing**: Dedicated system for sharing and discussing problems with location tracking
+- **Query Collection**: Enumerators can collect queries from the field with detailed information
+- **Role-Based Access**: Three-tier role system (User, Enumerator, Admin)
+- **Admin Moderation**: Administrators can manage issues, queries, and provide feedback
+- **User Tracking**: Users can track their submitted issues and collected queries
+- **Admin Remarks**: Administrators can add feedback and remarks on issues and queries
 - **User Profiles**: Personal profiles and account management
 - **Clean Interface**: Modern, responsive design with dark/light theme support
 
@@ -42,22 +46,51 @@ General Q&A provides a simple, user-friendly platform for knowledge sharing:
 ### 1. User Management
 - User registration and authentication
 - Profile management
-- Role-based access (User/Admin)
+- Three-tier role system: User, Enumerator, Admin
+- Admin can create users and assign roles
+- Role-based access control throughout the platform
 
 ### 2. Problem Sharing
-- Users can share problems and issues
-- Community engagement with problems
-- Admin moderation and management
+- Users can share problems and issues with mandatory location
+- Automatic geolocation support with reverse geocoding
+- Location tracking with coordinates and map links
+- Status tracking (open, in-progress, closed)
+- Users can view their submitted issues and status
+- Admin remarks/feedback visible to users
 
-### 3. Admin Dashboard
-- User management
-- Problem/issue management
-- Analytics and reporting
+### 3. Query Collection System
+- Enumerators can collect queries from the field
+- Detailed query information: person name, contact, location, category, urgency
+- Query status tracking (collected, reviewed, in-progress, resolved)
+- Enumerators and admins can view their collected queries
+- Location tracking with coordinates and map integration
+- Admin remarks/feedback on queries
 
-### 4. User Experience
+### 4. Admin Dashboard
+- User management with role assignment
+- Issue management with status updates and remarks
+- Query management with status updates and remarks
+- View all issues and queries
+- Add admin remarks/feedback on issues and queries
+
+### 5. User Tracking
+- **My Submitted Issues**: Users can view their submitted issues with status and admin remarks
+- **My Query Submissions**: Enumerators and admins can view their collected queries with status and admin remarks
+- Real-time status updates
+- Location details with map links
+
+### 6. Admin Remarks System
+- Administrators can add optional feedback/remarks on issues
+- Administrators can add optional feedback/remarks on queries
+- Remarks visible to users on their submitted issues
+- Remarks visible to enumerators on their collected queries
+- Yellow-highlighted section for easy identification
+
+### 7. User Experience
 - Clean, intuitive interface
 - Dark/Light theme toggle
 - Responsive mobile design
+- Location-based features with geolocation API
 
 ## 📁 Project Structure
 
@@ -79,37 +112,41 @@ Gen_Qa/
 │   ├── session.js         # Session handling
 │   ├── ThemeContext.js    # Theme state management
 │   ├── withAdminAuth.js   # Admin route protection HOC
-│   └── withAuth.js        # User route protection HOC
+│   ├── withAuth.js        # User route protection HOC
+│   └── withEnumeratorAuth.js # Enumerator route protection HOC
 │
 ├── models/                # MongoDB schemas
-│   ├── PickupRequest.js   # Pickup request model
-│   ├── Problem.js         # Problem/issue model
-│   └── User.js            # User account model
+│   ├── Problem.js         # Problem/issue model with adminNotes
+│   ├── Query.js           # Query collection model
+│   └── User.js            # User account model with role system
 │
 ├── pages/                 # Application routes and API endpoints
 │   ├── _app.js            # Next.js app initialization
 │   ├── _document.js       # HTML document customization
 │   ├── about.js           # About page
 │   ├── contact.js         # Contact information page
-│   ├── dashboard.js       # Admin dashboard
+│   ├── dashboard.js       # Admin dashboard (user management)
 │   ├── home.js            # Homepage
 │   ├── index.js           # Root route (redirects to home)
 │   ├── login.js           # User authentication
-│   ├── profile.js          # User profile management
+│   ├── profile.js         # User profile management
 │   ├── signup.js          # New user registration
-│   ├── share-problem.js   # Share a problem page
-│   ├── pickup-request.js  # Pickup request page
-│   ├── my-pickup-requests.js # User's pickup requests
-│   ├── all-pickup-requests.js # All pickup requests (admin)
+│   ├── share-problem.js   # Share a problem page (with location)
+│   ├── my-issues.js       # User's submitted issues
+│   ├── query-collection.js # Query collection page (enumerator/admin)
+│   ├── my-query-submissions.js # My collected queries (enumerator/admin)
 │   │
 │   ├── admin/             # Admin pages
-│   │   └── issues.js       # Problem management
+│   │   ├── issues.js       # All issues management
+│   │   └── queries.js      # All queries management
 │   │
 │   └── api/               # Backend API routes
 │       ├── auth/          # Authentication endpoints
 │       ├── admin/         # Admin-only endpoints
-│       ├── problems.js    # Problem management endpoints
-│       ├── pickup-requests.js # Pickup request endpoints
+│       │   ├── problems/  # Admin problem management
+│       │   └── queries/   # Admin query management
+│       ├── problems.js    # Problem management endpoints (user issues)
+│       ├── queries.js     # Query management endpoints
 │       └── users.js       # User management endpoints
 │
 ├── public/                # Static assets
@@ -164,29 +201,68 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Regular User
 - Create account and manage profile
-- Share problems and issues
-- View community problems
-- Submit pickup requests
-- View own pickup requests
+- Share problems and issues with location tracking
+- View own submitted issues and status
+- View admin remarks on their issues
+
+### Enumerator
+- All regular user capabilities
+- Collect queries from the field
+- Access query collection page
+- View own collected queries and status
+- View admin remarks on their queries
+- Cannot access admin dashboard or view all queries
 
 ### Administrator
-- All regular user capabilities
-- Manage user accounts
+- All regular user and enumerator capabilities
+- Manage user accounts and assign roles
+- Create new users with any role
 - Moderate problems and issues
-- Manage pickup requests
+- Manage all queries
+- Add remarks/feedback on issues and queries
 - Access admin dashboard
+- View all issues and queries
 - View platform analytics
 
 ## 🔄 Key Features
 
 ### Problem Sharing
-Users can share problems they're facing, allowing the community to help find solutions.
+- Users can share problems they're facing with mandatory location
+- Automatic geolocation detection with reverse geocoding
+- Manual location entry option
+- Location details with coordinates and map links
+- Status tracking (open, in-progress, closed)
+- Users can view their submitted issues and admin remarks
 
-### Pickup Requests
-Users can submit pickup requests for various services.
+### Query Collection System
+- Enumerators and admins can collect queries from the field
+- Comprehensive query form: person name, contact info, location, category, urgency, description
+- Automatic location detection or manual entry
+- Query status tracking (collected, reviewed, in-progress, resolved)
+- Enumerators can view their collected queries
+- Admin remarks visible on queries
+
+### Location Features
+- Automatic device geolocation support
+- Reverse geocoding using OpenStreetMap Nominatim API
+- Manual location entry fallback
+- Coordinate tracking (latitude/longitude)
+- Google Maps integration for location viewing
+- Location displayed in issues and queries
+
+### Admin Remarks System
+- Administrators can add optional feedback on issues and queries
+- Remarks visible to users on their submitted issues
+- Remarks visible to enumerators on their collected queries
+- Yellow-highlighted section for easy identification
+- Can be updated at any time by admins
 
 ### Admin Management
-Administrators can manage all user-generated content, moderate issues, and oversee platform operations.
+- Administrators can manage all user-generated content
+- Moderate issues and queries with status updates
+- Add remarks/feedback on issues and queries
+- User management with role assignment
+- Oversee platform operations
 
 ## 🤝 Contributing
 

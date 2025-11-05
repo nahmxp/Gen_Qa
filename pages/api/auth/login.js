@@ -51,7 +51,8 @@ export default async function handler(req, res) {
       name: user.name,
       email: user.email,
       username: user.username,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin || user.role === 'admin',
+      role: user.role || (user.isAdmin ? 'admin' : 'user')
     }
   });
 } 

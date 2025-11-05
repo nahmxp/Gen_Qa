@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     }
 
     if (method === 'PUT') {
-      const { name, email, username, password, isAdmin } = req.body;
+      const { name, email, username, password, isAdmin, role } = req.body;
       
       // Validate required fields
       if (!name || !email || !username) {
@@ -57,9 +57,17 @@ export default async function handler(req, res) {
       // Create update data (excluding password if not provided)
       const updateData = { name, email, username };
       
-      // Include isAdmin in update data if provided
-      if (isAdmin !== undefined) {
+      // Handle role assignment - prioritize role field
+      if (role !== undefined) {
+        // Validate role
+        if (['user', 'enumerator', 'admin'].includes(role)) {
+          updateData.role = role;
+          updateData.isAdmin = role === 'admin'; // Sync isAdmin with role
+        }
+      } else if (isAdmin !== undefined) {
+        // Fallback to isAdmin if role not provided
         updateData.isAdmin = isAdmin;
+        updateData.role = isAdmin ? 'admin' : 'user';
       }
       
       if (password) {
@@ -79,7 +87,8 @@ export default async function handler(req, res) {
         name: updatedUser.name,
         email: updatedUser.email,
         username: updatedUser.username,
-        isAdmin: updatedUser.isAdmin,
+        isAdmin: updatedUser.isAdmin || updatedUser.role === 'admin',
+        role: updatedUser.role || (updatedUser.isAdmin ? 'admin' : 'user'),
         createdAt: updatedUser.createdAt,
         updatedAt: updatedUser.updatedAt
       };
@@ -88,14 +97,27 @@ export default async function handler(req, res) {
     }
     
     else if (method === 'PATCH') {
-      // Handle partial updates, especially for admin status
-      const updates = req.body;
+      // Handle partial updates, especially for admin status and role
+      const updates = { ...req.body };
       
       if (Object.keys(updates).length === 0) {
         return res.status(400).json({
           success: false,
           message: 'No update data provided'
         });
+      }
+      
+      // Handle role assignment - prioritize role field
+      if (updates.role !== undefined) {
+        // Validate role
+        if (['user', 'enumerator', 'admin'].includes(updates.role)) {
+          updates.isAdmin = updates.role === 'admin'; // Sync isAdmin with role
+        } else {
+          delete updates.role; // Invalid role, remove it
+        }
+      } else if (updates.isAdmin !== undefined) {
+        // Fallback to isAdmin if role not provided
+        updates.role = updates.isAdmin ? 'admin' : 'user';
       }
       
       // Update user with only the provided fields
@@ -118,7 +140,8 @@ export default async function handler(req, res) {
         name: updatedUser.name,
         email: updatedUser.email,
         username: updatedUser.username,
-        isAdmin: updatedUser.isAdmin,
+        isAdmin: updatedUser.isAdmin || updatedUser.role === 'admin',
+        role: updatedUser.role || (updatedUser.isAdmin ? 'admin' : 'user'),
         createdAt: updatedUser.createdAt,
         updatedAt: updatedUser.updatedAt
       });

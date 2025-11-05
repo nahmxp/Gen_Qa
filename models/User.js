@@ -40,6 +40,8 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  // Virtual or computed: isAdmin should be true if role is 'admin'
+  // We'll keep isAdmin for backward compatibility but role is the source of truth
   createdAt: {
     type: Date,
     default: Date.now
@@ -48,7 +50,7 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  role: { type: String, enum: ['user', 'admin'], default: 'user' }
+  role: { type: String, enum: ['user', 'enumerator', 'admin'], default: 'user' }
 }, {
   timestamps: true
 });

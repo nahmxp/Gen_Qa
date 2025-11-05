@@ -22,12 +22,18 @@ export default async function handler(req, res) {
       // Fetch all users but exclude sensitive information like password
       const users = await User.find({}).select('-password');
       
+      // Return users with role field
+      const usersWithRole = users.map(user => ({
+        ...user.toObject(),
+        role: user.role || (user.isAdmin ? 'admin' : 'user')
+      }));
+      
       // Return users as JSON response
-      return res.status(200).json(users);
+      return res.status(200).json(usersWithRole);
     }
     
     else if (method === 'POST') {
-      const { name, email, username, password, isAdmin } = req.body;
+      const { name, email, username, password, isAdmin, role } = req.body;
       
       // Validate required fields
       if (!name || !email || !username || !password) {
@@ -55,13 +61,25 @@ export default async function handler(req, res) {
         });
       }
       
+      // Determine role - prioritize role field, fallback to isAdmin
+      let userRole = role || 'user';
+      if (!role && isAdmin) {
+        userRole = 'admin';
+      }
+      
+      // Ensure role is valid
+      if (!['user', 'enumerator', 'admin'].includes(userRole)) {
+        userRole = 'user';
+      }
+      
       // Create new user
       const newUser = await User.create({
         name,
         email,
         username,
         password, // Password will be hashed by the User model pre-save hook
-        isAdmin: isAdmin || false // Default to regular user if not specified
+        role: userRole,
+        isAdmin: userRole === 'admin' // Sync isAdmin with role
       });
       
       // Return user without password
@@ -70,7 +88,8 @@ export default async function handler(req, res) {
         name: newUser.name,
         email: newUser.email,
         username: newUser.username,
-        isAdmin: newUser.isAdmin,
+        isAdmin: newUser.isAdmin || newUser.role === 'admin',
+        role: newUser.role || (newUser.isAdmin ? 'admin' : 'user'),
         createdAt: newUser.createdAt,
         updatedAt: newUser.updatedAt
       };

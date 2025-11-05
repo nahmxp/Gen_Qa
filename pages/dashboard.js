@@ -16,7 +16,7 @@ function UserDashboard() {
     email: '',
     username: '',
     password: '',
-    isAdmin: false
+    role: 'user'
   });
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
@@ -69,14 +69,12 @@ function UserDashboard() {
     );
   });
 
-  // Sort users to place admins at the top
+  // Sort users: admins first, then enumerators, then regular users
   const sortedUsers = [...filteredUsers].sort((a, b) => {
-    // If a is admin and b is not, a comes first
-    if (a.isAdmin && !b.isAdmin) return -1;
-    // If b is admin and a is not, b comes first
-    if (!a.isAdmin && b.isAdmin) return 1;
-    // Otherwise maintain existing order (could add secondary sort criteria here)
-    return 0;
+    const roleOrder = { admin: 0, enumerator: 1, user: 2 };
+    const roleA = a.role || (a.isAdmin ? 'admin' : 'user');
+    const roleB = b.role || (b.isAdmin ? 'admin' : 'user');
+    return (roleOrder[roleA] || 2) - (roleOrder[roleB] || 2);
   });
 
   const handleSearchChange = (e) => {
@@ -102,7 +100,7 @@ function UserDashboard() {
             email: userToEdit.email || '',
             username: userToEdit.username || '',
             password: '', // Don't pre-fill password
-            isAdmin: userToEdit.isAdmin || false
+            role: userToEdit.role || (userToEdit.isAdmin ? 'admin' : 'user')
           });
         }
       } else {
@@ -112,7 +110,7 @@ function UserDashboard() {
           email: '',
           username: '',
           password: '',
-          isAdmin: false
+          role: 'user'
         });
       }
     }
@@ -203,7 +201,7 @@ function UserDashboard() {
         email: '',
         username: '',
         password: '',
-        isAdmin: false
+        role: 'user'
       });
       
       // Close modal after a delay
@@ -225,7 +223,7 @@ function UserDashboard() {
     }
   };
 
-  const handleAdminStatusChange = async (userId, isAdmin) => {
+  const handleRoleChange = async (userId, newRole) => {
     // Set loading state for this specific user
     setAdminLoading(prev => ({ ...prev, [userId]: true }));
     
@@ -235,11 +233,11 @@ function UserDashboard() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ isAdmin })
+        body: JSON.stringify({ role: newRole })
       });
       
       if (!res.ok) {
-        throw new Error('Failed to update admin status');
+        throw new Error('Failed to update user role');
       }
       
       const data = await res.json();
@@ -247,7 +245,7 @@ function UserDashboard() {
       // Update user in the list
       setUsers(users.map(u => u._id === userId ? data : u));
       
-      console.log(`User admin status updated: ${data.isAdmin ? 'Admin' : 'User'}`);
+      console.log(`User role updated: ${newRole}`);
       
       // Refresh the user list to ensure it's up to date
       setTimeout(() => fetchUsers(true), 500);
@@ -258,8 +256,8 @@ function UserDashboard() {
       }
       
     } catch (error) {
-      console.error('Error updating admin status:', error);
-      alert('Failed to update admin status. Please try again.');
+      console.error('Error updating user role:', error);
+      alert('Failed to update user role. Please try again.');
     } finally {
       // Remove loading state for this user
       setAdminLoading(prev => {
@@ -378,36 +376,56 @@ function UserDashboard() {
           <tbody>
             {sortedUsers.length > 0 ? (
               sortedUsers.map((userItem) => (
-                <tr key={userItem._id} className={userItem.isAdmin ? 'admin-row' : ''}>
+                <tr key={userItem._id} className={(() => {
+                  const userRole = userItem.role || (userItem.isAdmin ? 'admin' : 'user');
+                  return userRole === 'admin' ? 'admin-row' : userRole === 'enumerator' ? 'enumerator-row' : '';
+                })()}>
                   <td>{userItem.name}</td>
                   <td>{userItem.username}</td>
                   <td>{userItem.email}</td>
                   <td>{new Date(userItem.createdAt).toLocaleDateString()}</td>
                   <td className="role-column">
                     <div className="role-selector">
-                      <label className={`role-option ${userItem.isAdmin ? 'active' : ''}`}>
-                        <input
-                          type="radio"
-                          name={`role-${userItem._id}`}
-                          checked={userItem.isAdmin}
-                          onChange={() => handleAdminStatusChange(userItem._id, true)}
-                          disabled={adminLoading[userItem._id]}
-                        />
-                        Admin
-                      </label>
-                      <label className={`role-option ${!userItem.isAdmin ? 'active' : ''}`}>
-                        <input
-                          type="radio"
-                          name={`role-${userItem._id}`}
-                          checked={!userItem.isAdmin}
-                          onChange={() => handleAdminStatusChange(userItem._id, false)}
-                          disabled={adminLoading[userItem._id]}
-                        />
-                        User
-                      </label>
-                      {adminLoading[userItem._id] && (
-                        <span className="role-loading"></span>
-                      )}
+                      {(() => {
+                        const userRole = userItem.role || (userItem.isAdmin ? 'admin' : 'user');
+                        return (
+                          <>
+                            <label className={`role-option ${userRole === 'user' ? 'active' : ''}`}>
+                              <input
+                                type="radio"
+                                name={`role-${userItem._id}`}
+                                checked={userRole === 'user'}
+                                onChange={() => handleRoleChange(userItem._id, 'user')}
+                                disabled={adminLoading[userItem._id]}
+                              />
+                              User
+                            </label>
+                            <label className={`role-option ${userRole === 'enumerator' ? 'active' : ''}`}>
+                              <input
+                                type="radio"
+                                name={`role-${userItem._id}`}
+                                checked={userRole === 'enumerator'}
+                                onChange={() => handleRoleChange(userItem._id, 'enumerator')}
+                                disabled={adminLoading[userItem._id]}
+                              />
+                              Enumerator
+                            </label>
+                            <label className={`role-option ${userRole === 'admin' ? 'active' : ''}`}>
+                              <input
+                                type="radio"
+                                name={`role-${userItem._id}`}
+                                checked={userRole === 'admin'}
+                                onChange={() => handleRoleChange(userItem._id, 'admin')}
+                                disabled={adminLoading[userItem._id]}
+                              />
+                              Admin
+                            </label>
+                            {adminLoading[userItem._id] && (
+                              <span className="role-loading"></span>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </td>
                   <td className="action-buttons">
@@ -507,17 +525,23 @@ function UserDashboard() {
                 </div>
                 
                 <div className="form-group">
-                  <label className="checkbox-label">
-                    <input 
-                      type="checkbox" 
-                      name="isAdmin"
-                      checked={newUser.isAdmin}
-                      onChange={handleInputChange}
-                      disabled={formLoading}
-                    />
-                    <span>Admin privileges</span>
-                  </label>
-                  <small>Admins can manage users and have full access to the system.</small>
+                  <label htmlFor="role">Role</label>
+                  <select
+                    id="role"
+                    name="role"
+                    value={newUser.role}
+                    onChange={handleInputChange}
+                    disabled={formLoading}
+                  >
+                    <option value="user">User</option>
+                    <option value="enumerator">Enumerator</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <small>
+                    {newUser.role === 'user' && 'Regular users can submit problems and view their own issues.'}
+                    {newUser.role === 'enumerator' && 'Enumerators can collect queries and access the query collection page.'}
+                    {newUser.role === 'admin' && 'Admins have full access to manage users and view all queries.'}
+                  </small>
                 </div>
                 
                 <div className="form-actions">

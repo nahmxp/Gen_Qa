@@ -1,6 +1,6 @@
 import dbConnect from '../../../../lib/mongodb';
 import checkAdminAuth from '../../../../lib/checkAdminAuth';
-import Problem from '../../../../models/Problem';
+import Query from '../../../../models/Query';
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -19,12 +19,9 @@ export default async function handler(req, res) {
     try {
       const { status, adminNotes } = req.body || {};
       
-      if (status && !['open','in-progress','closed'].includes(status)) {
+      if (status && !['collected', 'reviewed', 'in-progress', 'resolved'].includes(status)) {
         return res.status(400).json({ success: false, message: 'Invalid status' });
       }
-
-      const problem = await Problem.findById(id);
-      if (!problem) return res.status(404).json({ success: false, message: 'Problem not found' });
 
       const updateData = {};
       if (status) updateData.status = status;
@@ -34,12 +31,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, message: 'No update data provided' });
       }
 
-      const updatedProblem = await Problem.findByIdAndUpdate(id, updateData, { new: true });
-      if (!updatedProblem) return res.status(404).json({ success: false, message: 'Problem not found' });
+      const query = await Query.findByIdAndUpdate(id, updateData, { new: true }).populate('collectedBy', 'name email');
+      if (!query) return res.status(404).json({ success: false, message: 'Query not found' });
 
-      return res.status(200).json({ success: true, data: updatedProblem });
+      return res.status(200).json({ success: true, data: query });
     } catch (err) {
-      console.error('Error updating problem', err);
+      console.error('Error updating query status', err);
       return res.status(500).json({ success: false, message: 'Server error' });
     }
   }
@@ -47,3 +44,4 @@ export default async function handler(req, res) {
   res.setHeader('Allow', ['PATCH']);
   return res.status(405).end(`Method ${method} Not Allowed`);
 }
+
